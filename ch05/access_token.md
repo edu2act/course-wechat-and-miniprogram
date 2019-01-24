@@ -40,7 +40,7 @@ access_token是公众号的全局唯一接口调用凭据，**公众号调用各
 **这里给出的示例使用了个人开发的一些库，可以使用自己擅长的工具，不必严格按照示例。**
 
 #### NodeJS获取access_token示例
-```
+``` JavaScript
 //ant-http是一个简单的http/https客户端请求库，可以使用npm i ant-http安装
 const anthttp = require('ant-http');
 
