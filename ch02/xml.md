@@ -11,7 +11,7 @@ XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像�
 <message>
     <from>金刚狼</from>
     <to>Beast</to>
-    <Content>中午找你吃饭</Content>
+    <content>中午请你吃饭</content>
 </message>
 ```
 
@@ -45,12 +45,45 @@ XML的注释和HTML使用的方式一致：
 <!-- 这是一段XML的注释 -->
 ```
 
-#### **XML示例**
+#### **XML正确格式与错误格式示例**
+
+``` XML
+<!--这是正确的格式，并且xml的声明可以去掉-->
+<?xml version="1.0" encoding="utf-8" ?>
+<person>
+    <name>Brave</name>
+    <age>28</age>
+    <identity>Programmer</identity>
+<person>
+
+<!--这是正确的格式-->
+<person>
+    <name id="1001">Brave</name>
+    <age>28</age>
+    <identity>Programmer</identity>
+<person>
+
+<!--这是错误的格式，没有根元素-->
+    <name>Brave</name>
+    <age>28</age>
+    <identity>Programmer</identity>
+
+<!--这是错误的格式，标签大小写不一致-->
+<person>
+    <name>Brave</Name>
+    <age>28</age>
+    <identity>Programmer</identity>
+</person>
+
+<!--这是错误的格式，属性没有加引号-->
+<person>
+    <name id=1001>Brave</Name>
+    <age>28</age>
+    <identity>Programmer</identity>
+</person>
+
 
 ```
-
-```
-
 
 
 #### **解析XML**

@@ -1,6 +1,8 @@
 #### **access_token**
 
-access_token是公众号的全局唯一接口调用凭据，**公众号调用各接口时都需使用access_token。**access_token的有效期目前为2个小时，需定时刷新，重复获取将导致上次获取的access_token失效。
+access_token是公众号的全局唯一接口调用凭据，**公众号调用各接口时都需使用access_token。**
+
+access_token的有效期目前为2个小时，需定时刷新，重复获取将导致上次获取的access_token失效。
 
 #### **获取access_token的条件**
 
