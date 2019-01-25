@@ -83,6 +83,36 @@ XML的注释和HTML使用的方式一致：
 
 ```
 
+#### **XML CDATA**
+
+对于以下数据，解析操作会把所有文本当作XML解析，但是content字段的内容不想被解析，这时候要使用CDATA。
+
+``` XML
+<message>
+    <from>A</from>
+    <to>B</to>
+    <content>
+        <p>First</p>
+        <p>Second</p>
+    </content>
+</message>
+
+<!-- 要想content字段内容不被解析，需要使用CDATA包含 -->
+<message>
+    <from>A</from>
+    <to>B</to>
+    <content>
+        <![CDATA[
+        <p>First</p>
+        <p>Second</p>
+        ]]>
+    </content>
+</message>
+
+```
+
+CDATA使用从<![CDATA[开始，以]]>结束。]]>中间不能有任何字符。并且CDATA中间不能有]]>字符，也不能嵌套CDATA。
+
 
 #### **解析XML**
 
