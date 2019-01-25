@@ -24,7 +24,7 @@ XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像�
 尽管目前在Web领域似乎JSON关注度比较高，但是XML的地位可以和HTML并列，而且我们使用的大量工具其内部都使用了XML，其中就包括Office、WPS等办公软件，其内部就是XML文档与媒体文件的组合。
 
 
-##### **XML语法规则**
+#### **XML语法规则**
 * 必须有根元素
 * 所有的元素都必须有一个闭合标签
 * 标签对大小写敏感
@@ -38,6 +38,6 @@ XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像�
 ```
 
 
-##### **解析XML**
+#### **解析XML**
 
 解析XML，NodeJS有很多可用的扩展。这里使用了xml2js作为NodeJS的XML解析。
