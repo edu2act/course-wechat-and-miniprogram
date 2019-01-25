@@ -1,4 +1,4 @@
-##### **XML基础**
+#### **XML基础**
 
 XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像超文本标记语言的标记语言，因为格式很相似。但是XML的标签没有被预定义,需要自行定义标签。XML与HTML的差异:
 * XML不是HTML的替代。
