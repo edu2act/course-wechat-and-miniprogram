@@ -7,7 +7,7 @@ XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像�
 
 先认识一下XML：
 
-```
+``` XML
 <message>
     <from>金刚狼</from>
     <to>Beast</to>
@@ -36,6 +36,21 @@ XML是可扩展标记语言(Extensible Markup Language )的缩写。 XML很像�
 ``` XML
 <?xml version="1.0" encoding="utf-8" ?>
 ```
+
+**XML注释**
+
+XML的注释和HTML使用的方式一致：
+
+``` XML
+<!-- 这是一段XML的注释 -->
+```
+
+#### **XML示例**
+
+```
+
+```
+
 
 
 #### **解析XML**
