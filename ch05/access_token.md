@@ -39,11 +39,14 @@ access_token的有效期目前为2个小时，需定时刷新，重复获取将�
 
 使用AppID以及AppSecret构造请求接口参数，通过https的请求客户端调用获取access_token。
 
-**这里给出的示例使用了个人开发的一些库，可以使用自己擅长的工具，不必严格按照示例。**
 
 #### NodeJS获取access_token示例
+
 ``` JavaScript
-//ant-http是一个简单的http/https客户端请求库，可以使用npm i ant-http安装
+/*
+    ant-http是一个简单的http/https客户端请求库，可以使用npm i ant-http安装。
+    使用其他库要修改这段代码，但是处理逻辑并不困难。
+*/
 const anthttp = require('ant-http');
 
 var appid = '你的APPID';
