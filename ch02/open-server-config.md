@@ -56,9 +56,9 @@ ant.get('/wx/talk', (req, res) => {
 		
     if (req.GET['signature'] === sign.digest('hex')) {
         res.send(req.GET['echostr']);
+    } else {
+        res.send('');
     }
-
-    res.send('');
 });
 
 ant.run('localhost', 8192);
