@@ -1,29 +1,14 @@
-### 完整的消息回复处理
-
-在上一章配置好服务器URL并认证后，实现了简单的文本消息回复，本章会针对不同消息类型进行处理。并给出NodeJS的示例代码。
-
-需要注意的是，消息回复要及时并且格式要正确，根据开发者文档，以下情况会提示 “该公众号暂时无法提供服务，请稍后再试”。
-> 1. 开发者在5秒内未回复任何内容
-> 2. 开发者回复了异常数据
-
-**如果不需要回复内容，避免错误提示可以直接回复success字符串或者是空字符串。**
-
-#### NodeJS设计方式
-在已实现代码的基础上进行修改，从获取消息并处理的请求开始，调用消息预处理函数，预处理函数首先判断是不是关键字自动回复，是的话则进行相应的回复，否则调用通用的消息回复处理函数，在这里就是把接收到的消息原样返回。
-
-示例代码使用了preMsgHandle函数作为预处理函数，formatTpl用于消息格式化函数。调用过程为：
-
-获取POST提交的请求消息，解析XML格式的消息，之后交给preMsgHandle函数处理，preMsgHandle函数根据消息类型查看是不是关键词，支持的关键词回复特定消息，否则交给formatTpl格式化消息返回结果。
-
-``` JavaScript
-const ant = require('ant-army');
+const awy = require('awy');
 const crypto = require('crypto');
 const parsexml = require('xml2js').parseString;
 
-ant.config.daemon = true;  //开启守护进程
+var ant = new awy();
 
-function formatTpl(data, msgtype) {
-    switch(msgtype) {
+//开启守护进程模式
+ant.config.daemon = true;
+
+function formatTpl(data) {
+    switch(data.msgtype) {
 
         case 'text':
             return `
@@ -85,37 +70,104 @@ function formatTpl(data, msgtype) {
     }
 }
 
-function preMsgHandle(xmsg, retmsg) {
+function clickKeyMsg(xmsg, retmsg) {
+    if (xmsg.EventKey == 'about-us') {
+        retmsg.msg = `我们是奋斗的程序员`;
+        retmsg.msgtype = 'text';
+        return formatTpl(retmsg);
+    } else {
+        return "success";
+    }
+}
+
+function scanQrcode(xmsg, retmsg) {
+    retmsg.msg = `${xmsg.EventKey}`;
+    ret.msgtype = 'text';
+    return formatTpl(retmsg);
+}
+
+function eventMsgHandle(xmsg, retmsg) {
+
+    switch(xmsg.Event) {
+        case 'LOCATION':
+            //console.log(xmsg);
+            retmsg.msg = `${xmsg.FromUserName} ：\nLatitude: ${xmsg.Latitude}\nLongitude: ${xmsg.Longitude}\n`;
+            retmsg.msgtype = 'text';
+            return "success";
+
+        case 'subscribe':
+            console.log('User subscribe, OpenID:', xmsg.FromUserName);
+            retmsg.msg = '你好，欢迎关注本公众号，这是一个教学用的测试号';
+            retmsg.msgtype = 'text';
+            return formatTpl(retmsg);
+
+        case 'unsubscribe':
+            console.log(`取消关注：${xmsg.FromUserName}`);
+            return ;
+
+        case 'CLICK':
+            return clickKeyMsg(xmsg, retmsg);
+
+        case 'SCAN':
+            return scanQrcode(xmsg, retmsg);
+
+        default:
+            return "";
+    }
+}
+
+function userMsgHandle(xmsg, retmsg) {
     if (xmsg.MsgType == 'text') {
         if (xmsg.Content == 'help' || xmsg.Content == '?' || xmsg.Content == '？') {
+
             retmsg.msg = help();
-            return formatTpl(retmsg, 'text');
+            retmsg.msgtype = 'text';
+            return formatTpl(retmsg);
+
         } else if (xmsg.Content == 'hello' || xmsg.Content == '你好'){
+
             retmsg.msg = '你好，你可以输入一些关键字测试消息回复，输入help/?获取帮助';
-            return formatTpl(retmsg, 'text');
+            retmsg.msgtype = 'text';
+            return formatTpl(retmsg);
+
         } else {
+
             retmsg.msg = xmsg.Content;
-            return formatTpl(retmsg, xmsg.MsgType);
+            retmsg.msgtype = xmsg.MsgType;
+            return formatTpl(retmsg);
+
         }
     } else {
         switch(xmsg.MsgType) {
             case 'text':
                 retmsg.msg = xmsg.Content;
+                retmsg.msgtype = 'text';
                 break;
             case 'image':
             case 'voice':
             case 'video':
                 retmsg.msg = xmsg.MediaId;
+                retmsg.msgtype = xmsg.MsgType;
                 break;
             default:
                 retmsg.msg = '不支持的类型';
         }
-        if (xmsg.MsgType == 'video') {
-            retmsg.thumb = xmsg.ThumbMediaId;
-        }
-        return formatTpl(retmsg, xmsg.MsgType);
+
+        return formatTpl(retmsg);
     }
 
+}
+
+function preMsgHandle(xmsg, retmsg) {
+    if (xmsg.MsgType == 'event') {
+        
+        return eventMsgHandle(xmsg, retmsg);
+
+    } else {
+
+        return userMsgHandle(xmsg, retmsg);
+
+    }
 }
 
 function help() {
@@ -123,33 +175,35 @@ function help() {
 }
 
 
+ant.post('/wx/talk', async (rr) => {
+    //输出收到的消息用于观察测试
+    console.log(rr.req.GetBody());
 
-ant.post('/wx/talk', (req, res) => {
-    /*
-        explicitArray : false表示在解析XML数据的时候，数据作为文本而不是数组，
-        否则在默认情况下会解析成数组，操作不方便。
-    */
-    parsexml(req.POST, {explicitArray : false}, (err, result) => {
-        if (err) {
-            console.log(err);
-            res.send('');
-        } else {
-            var xmlmsg = result.xml;
-            var retmsg = {
-                touser      : xmlmsg.FromUserName,
-                fromuser    : xmlmsg.ToUserName,
-                msgtime     : parseInt((new Date()).getTime() / 1000)
-            };
+    await new Promise((rv, rj) => {
+    
+        parsexml(rr.req.GetBody(), {explicitArray : false}, (err, result) => {
+            if (err) {
+                rr.res.Body = '';
+                throw err;
+            } else {
+                var xmlmsg = result.xml;
+                var retmsg = {
+                    touser      : xmlmsg.FromUserName,
+                    fromuser    : xmlmsg.ToUserName,
+                    msgtime     : parseInt((new Date()).getTime() / 1000),
+                    msgtype     : ''
+                };
 
-            var retdata = preMsgHandle(xmlmsg, retmsg);
-            res.end(retdata);
-
-        }
+                var msgdata = preMsgHandle(xmlmsg, retmsg);
+                rv(msgdata);
+            }
+        });
+    }).then(data => {
+        rr.res.Body = data;
+    }).catch(err => {
+        console.log(err);
     });
+
 });
 
 ant.ants('localhost', 8192);
-
-```
-
-示例代码给出的是原样返回消息的过程，实际的处理要复杂，比如根据关键字自动搜索，很多功能还需要数据库查询。但是不建议被动消息回复处理比较复杂的请求，微信消息的长度有限制，并且请求太复杂可能导致延迟比较大，并且网络有不稳定情况，容易导致出现错误提示。
