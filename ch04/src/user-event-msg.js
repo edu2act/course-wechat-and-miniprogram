@@ -5,7 +5,7 @@ const parsexml = require('xml2js').parseString;
 var ant = new awy();
 
 //开启守护进程模式
-ant.config.daemon = true;
+//ant.config.daemon = true;
 
 function formatTpl(data) {
     switch(data.msgtype) {
@@ -206,4 +206,4 @@ ant.post('/wx/talk', async (rr) => {
 
 });
 
-ant.ants('localhost', 8192);
+ant.run('localhost', 8192);
